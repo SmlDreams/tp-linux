@@ -2,137 +2,33 @@
 
 # I. Script carte d'identité
 
-Vous allez écrire **un script qui récolte des informations sur le système et les affiche à l'utilisateur.** Il s'appellera `idcard.sh` et sera stocké dans `/srv/idcard/idcard.sh`.
-
-> `.sh` est l'extension qu'on donne par convention aux scripts réalisés pour être exécutés avec `sh` ou `bash`.
-
-➜ **Testez les commandes à la main avant de les incorporer au script.**
-
-➜ Ce que doit faire le script. Il doit afficher :
-
-- le **nom de la machine**
-  - 🐚 `hostnamectl`
-- le **nom de l'OS** de la machine
-  - regardez le fichier `/etc/redhat-release`
-  - 🐚 `source`
-- la **version du noyau** Linux utilisé par la machine
-  - 🐚 `uname`
-- l'**adresse IP** de la machine
-  - 🐚 `ip`
-- l'**état de la RAM**
-  - 🐚 `free`
-  - espace dispo en RAM (en Go, Mo, ou Ko)
-  - taille totale de la RAM (en Go, Mo, ou ko)
-- l'**espace restant sur le disque dur**, en Go (ou Mo, ou ko)
-  - 🐚 `df`
-- le **top 5 des processus** qui pompent le plus de RAM sur la machine actuellement. Procédez par étape :
-  - 🐚 `ps`
-  - listez les process
-  - affichez la RAM utilisée par chaque process
-  - triez par RAM utilisée
-  - isolez les 5 premiers
-- la **liste des ports en écoute** sur la machine, avec le programme qui est derrière
-  - 🐚 `ss`
-- un **lien vers une image/gif** random de chat 
-  - 🐚 `curl`
-  - il y a de très bons sites pour ça hihi
-  - avec [celui-ci](https://cataas.com/), une simple requête HTTP vers `https://cataas.com/cat` vous retourne l'URL d'une random image de chat
-    - une requête sur cette adresse retourne directement l'image, il faut l'enregistret dans un fichier
-    - parfois le fichier est un JPG, parfois un PNG, parfois même un GIF
-    - 🐚 `file` peut vous aider à déterminer le type de fichier
-
-Pour vous faire manipuler les sorties/entrées de commandes, votre script devra sortir **EXACTEMENT** :
-
-```bash
-$ /srv/idcard/idcard.sh
-Machine name : ...
-OS ... and kernel version is ...
-IP : ...
-RAM : ... RAM restante sur ... RAM totale
-Disque : ... space left
-Top 5 processes by RAM usage :
-  - ...
-  - ...
-  - ...
-  - ...
-  - ...
-Listening ports :
-  - 22 : sshd
-  - ...
-  - ...
-
-Here is your random cat : ./cat.jpg
-```
-
 ## Rendu
 
 📁 **Fichier `/srv/idcard/idcard.sh`**
 
 🌞 **Vous fournirez dans le compte-rendu**, en plus du fichier, **un exemple d'exécution avec une sortie**, dans des balises de code.
 
+```
+[dreams@tp3-linux ~]$ /srv/idcard/idcard.sh
+
+Machine name : tp3-linux
+OS Rocky Linux release 9.0 (Blue Onyx) and kernel version is Linux 5.14.0-70.26.1.el9_0.x86_64
+IP : 10.105.1.100/24
+RAM : 687Mi memory available on 960Mi total memory
+Disk : 5.1G space left
+Top 5 processes by RAM usage :
+ - /usr/bin/python3 -s /usr/sbin/firewalld --nofork --nopid
+ - /usr/sbin/NetworkManager --no-daemon
+ - /usr/lib/systemd/systemd --switched-root --system --deserialize 27
+ - /usr/lib/systemd/systemd --user
+ - sshd: dreams [priv]
+liste:wqning ports
+ - udp 323 :
+ - tcp 22 :
+Here is your random cat : ./cat.jpg
+```
+
 # II. Script youtube-dl
-
-**Un petit script qui télécharge des vidéos Youtube.** Vous l'appellerez `yt.sh`. Il sera stocké dans `/srv/yt/yt.sh`.
-
-**Pour ça on va avoir besoin d'une commande : `youtube-dl`.** Je vous laisse vous référer [à la doc officielle](https://github.com/ytdl-org/youtube-dl/blob/master/README.md#readme) pour voir comment récupérer cette commande sur votre machine.
-
-Comme toujours, **PRENEZ LE TEMPS** de manipuler la commande et d'explorer un peu le `youtube-dl --help`.
-
-Le contenu de votre script :
-
-➜ **1. Permettre le téléchargement d'une vidéo youtube dont l'URL est passée au script**
-
-- la vidéo devra être téléchargée dans le dossier `/srv/yt/downloads/`
-  - le script doit s'assurer que ce dossier existe sinon il quitte
-  - vous pouvez utiliser la commande `exit` pour que le script s'arrête
-- plus précisément, chaque téléchargement de vidéo créera un dossier
-  - `/srv/yt/downloads/<NOM_VIDEO>`
-  - il vous faudra donc, avant de télécharger la vidéo, exécuter une commande pour récupérer son nom afin de créer le dossier en fonction
-- la vidéo sera téléchargée dans
-  - `/srv/yt/downloads/<NOM_VIDEO>/<NOM_VIDEO>.mp4`
-- la description de la vidéo sera aussi téléchargée
-  - dans `/srv/yt/downloads/<NOM_VIDEO>/description`
-  - on peut récup la description avec une commande `youtube-dl`
-- la commande `youtube-dl` génère du texte dans le terminal, ce texte devra être masqué
-  - vous pouvez utiliser une redirection de flux vers `/dev/null`, c'est ce que l'on fait généralement pour se débarasser d'une sortie non-désirée
-
-Il est possible de récupérer les arguments passés au script dans les variables `$1`, `$2`, etc.
-
-```bash
-$ cat script.sh
-echo $1
-
-$ ./script.sh toto
-toto
-```
-
-➜ **2. Le script produira une sortie personnalisée**
-
-- utilisez la commande `echo` pour écrire dans le terminal
-- la sortie **DEVRA** être comme suit :
-
-```bash
-$ /srv/yt/yt.sh https://www.youtube.com/watch?v=sNx57atloH8
-Video https://www.youtube.com/watch?v=sNx57atloH8 was downloaded. 
-File path : /srv/yt/downloads/tomato anxiety/tomato anxiety.mp4`
-```
-
-➜ **3. A chaque vidéo téléchargée, votre script produira une ligne de log dans le fichier `/var/log/yt/download.log`**
-
-- votre script doit s'assurer que le dossier `/var/log/yt/` existe, sinon il refuse de s'exécuter
-- la ligne doit être comme suit :
-
-```
-[yy/mm/dd hh:mm:ss] Video <URL> was downloaded. File path : <PATH>`
-```
-
-Par exemple :
-
-```
-[21/11/12 13:22:47] Video https://www.youtube.com/watch?v=sNx57atloH8 was downloaded. File path : /srv/yt/downloads/tomato anxiety/tomato anxiety.mp4`
-```
-
-> Hint : La commande `date` permet d'afficher la date et de choisir à quel format elle sera affichée. Idéal pour générer des logs. [J'ai trouvé ce lien](https://www.geeksforgeeks.org/date-command-linux-examples/), premier résultat google pour moi, y'a de bons exemples (en bas de page surtout pour le formatage de la date en sortie).
 
 ## Rendu
 
@@ -142,110 +38,8 @@ Par exemple :
 
 🌞 Vous fournirez dans le compte-rendu, en plus du fichier, **un exemple d'exécution avec une sortie**, dans des balises de code.
 
-# III. MAKE IT A SERVICE
-
-YES. Yet again. **On va en faire un [service](../../cours/notions/serveur/README.md#ii-service).**
-
-L'idée :
-
-➜ plutôt que d'appeler la commande à la main quand on veut télécharger une vidéo, **on va créer un service qui les téléchargera pour nous**
-
-➜ le service devra **lire en permanence dans un fichier**
-
-- s'il trouve une nouvelle ligne dans le fichier, il vérifie que c'est bien une URL de vidéo youtube
-  - si oui, il la télécharge, puis enlève la ligne
-  - sinon, il enlève juste la ligne
-
-➜ **qui écrit dans le fichier pour ajouter des URLs ? Bah vous !**
-
-- vous pouvez écrire une liste d'URL, une par ligne, et le service devra les télécharger une par une
-
----
-
-Pour ça, procédez par étape :
-
-- **partez de votre script précédent** (gardez une copie propre du premier script, qui doit être livré dans le dépôt git)
-  - le nouveau script s'appellera `yt-v2.sh`
-- **adaptez-le pour qu'il lise les URL dans un fichier** plutôt qu'en argument sur la ligne de commande
-- **faites en sorte qu'il tourne en permanence**, et vérifie le contenu du fichier toutes les X secondes
-  - boucle infinie qui :
-    - lit un fichier
-    - effectue des actions si le fichier n'est pas vide
-    - sleep pendant une durée déterminée
-- **il doit marcher si on précise une vidéo par ligne**
-  - il les télécharge une par une
-  - et supprime les lignes une par une
-- **une fois que tout ça fonctionne, enfin, créez un service** qui lance votre script :
-  - créez un fichier `/etc/systemd/system/yt.service`. Il comporte :
-    - une brève description
-    - un `ExecStart` pour indiquer que ce service sert à lancer votre script
-    - une clause `User=` pour indiquer quel utilisateur doit lancer le script
-
-```bash
-[Unit]
-Description=<Votre description>
-
-[Service]
-ExecStart=<Votre script>
-User=<User>
-
-[Install]
-WantedBy=multi-user.target
 ```
-
-> Pour rappel, après la moindre modification dans le dossier `/etc/systemd/system/`, vous devez exécuter la commande `sudo systemctl daemon-reload` pour dire au système de lire les changements qu'on a effectué.
-
-Vous pourrez alors interagir avec votre service à l'aide des commandes habituelles `systemctl` :
-
-- `systemctl status yt`
-- `sudo systemctl start yt`
-- `sudo systemctl stop yt`
-
-![Now witness](./pics/now_witness.png)
-
-## Rendu
-
-📁 **Le script `/srv/yt/yt-v2.sh`**
-
-📁 **Fichier `/etc/systemd/system/yt.service`**
-
-🌞 Vous fournirez dans le compte-rendu, en plus des fichiers :
-
-- un `systemctl status yt` quand le service est en cours de fonctionnement
-- un extrait de `journalctl -xe -u yt`
-
-> Hé oui les commandes `journalctl` fonctionnent sur votre service pour voir les logs ! Et vous devriez constater que c'est vos `echo` qui pop. En résumé, **le STDOUT de votre script, c'est devenu les logs du service !**
-
-🌟**BONUS** : get fancy. Livrez moi un gif ou un [asciinema](https://asciinema.org/) (PS : c'est le feu asciinema) de votre service en action, où on voit les URLs de vidéos disparaître, et les fichiers apparaître dans le fichier de destination
-
-# IV. Bonus
-
-Quelques bonus pour améliorer le fonctionnement de votre script :
-
-➜ **en accord avec les règles de [ShellCheck](https://www.shellcheck.net/)**
-
-- bonnes pratiques, sécurité, lisibilité
-
-➜  **fonction `usage`**
-
-- le script comporte une fonction `usage`
-- c'est la fonction qui est appelée lorsque l'on appelle le script avec une erreur de syntaxe
-- ou lorsqu'on appelle le `-h` du script
-
-➜ **votre script a une gestion d'options :**
-
-- `-q` pour préciser la qualité des vidéos téléchargées (on peut choisir avec `youtube-dl`)
-- `-o` pour préciser un dossier autre que `/srv/yt/`
-- `-h` affiche l'usage
-
-➜ **si votre script utilise des commandes non-présentes à l'installation** (`youtube-dl`, `jq` éventuellement, etc.)
-
-- vous devez TESTER leur présence et refuser l'exécution du script
-
-➜  **si votre script a besoin de l'existence d'un dossier ou d'un utilisateur**
-
-- vous devez tester leur présence, sinon refuser l'exécution du script
-
-➜ **pour le téléchargement des vidéos**
-
-- vérifiez à l'aide d'une expression régulière que les strings saisies dans le fichier sont bien des URLs de vidéos Youtube
+[dreams@tp3-linux ~]$ bash /srv/yt/yt.sh https://www.youtube.com/watch?v=jjs27jXL0Zs
+Video https://www.youtube.com/watch?v=jjs27jXL0Zs was downloaded.
+File path : /srv/yt/downloads/SI LA VIDÉO DURE 1 SECONDE LA VIDÉO S'ARRÊTE/SI LA VIDÉO DURE 1 SECONDE LA VIDÉO S'ARRÊTE.mp4
+```
